@@ -1,0 +1,150 @@
+lr_model = LinearRegression() 
+Train Accuracy: 0.9392452488315629
+Train Loss: 0.03303001997604744
+val Accuracy: 0.939284156559173
+val Loss: 0.03300886734196585
+*******************************************
+lr_model_poly = LinearRegression() degree=3
+Train Accuracy: 0.9406314971155816
+Train Loss: 0.032276370135791176
+al Accuracy: 0.93978
+val Loss: 0.033816
+******************************************
+ridge_lr_model = Ridge(alpha=0.001, random_state=42) +poly_preprocessor
+Train Accuracy: 0.9397225905293017
+Train Loss: 0.03277050766617055
+val Accuracy: 0.939559
+val Loss: 0.032867
+*******************************************
+lasso_lr_model = Lasso(alpha=0.0001, random_state=42,max_iter=10000)+poly_preprocessor
+Train Accuracy: 0.9392304138071907
+Train Loss: 0.03303808520785124
+val Accuracy: 0.9391222538835198
+val Loss: 0.0331054806422046
+*********************************************
+elasticnet_lr_model = ElasticNet(alpha=0.01, l1_ratio=0.05, random_state=42,max_iter=10000) +poly_preprocessor
+Train Accuracy: 0.9389804936987253
+Train Loss: 0.03317395715228808
+val Accuracy: 0.9388962082029678
+val Loss: 0.03322845197759206
+************************************************
+knn_model = KNeighborsRegressor(n_neighbors=21)
+Train Accuracy: 0.868997777804853
+Train Loss: 0.07122086639802165
+Val Accuracy : 0.8484627405686404
+Val Loss: 0.08236885451135917
+**************************************************
+svr_model = SVR()
+Train Accuracy: 0.9400598641791988
+Train Loss: 0.032587144963184406
+Val Accuracy : 0.9381030876148992
+Val Loss: 0.03365816205949372
+*************************************************
+dt_model = DecisionTreeRegressor(max_depth=10,min_samples_split=10, min_samples_leaf=10,random_state=42)
+Train Accuracy: 0.948466319462396
+Train Loss: 0.0280168787602672
+Val Accuracy : 0.935273786889474
+Val Loss: 0.03518820063382376
+************************************************
+rf_model = RandomForestRegressor()
+Train Accuracy: 0.9935141545881421
+Train Loss: 0.003526104533311224
+Val Accuracy : 0.9516890026397693
+Val Loss: 0.026275931313423224
+********************************************************
+rf_model = RandomForestRegressor(max_depth=5,min_samples_split=10,min_samples_leaf=10,random_state=42)
+Train Accuracy: 0.9037887955801888
+Train Loss: 0.05230632901607348
+Val Accuracy : 0.9027634711684918
+Val Loss: 0.05284790091271391
+**********************************************
+rf_model = RandomForestRegressor(n_estimators=50,max_depth=10,min_samples_split=4,min_samples_leaf=3,random_state=42) result of gridsearch
+Train Accuracy: 0.9583578410254784
+Train Loss: 0.02263923917589432
+Val Accuracy : 0.9469629968479509
+Val Loss: 0.028837222244219834
+********************************************
+gb_model = GradientBoostingRegressor(alpha=0.01,max_depth=4,random_state=42)
+Train Accuracy: 0.9521367062514023
+Train Loss: 0.02602143072321425
+Val Accuracy : 0.9466811818796785
+Val Loss: 0.028990002709630137
+***********************************************
+gb_model = GradientBoostingRegressor(n_estimators=300,alpha=0.1,max_depth=7,random_state=42) result of gridsearch
+Train Accuracy: 0.9766620844577081
+Train Loss: 0.012687926487001656
+Val Accuracy : 0.9565773839348287
+Val Loss: 0.023609694359374718
+****************************************
+gb_model = GradientBoostingRegressor(max_depth=4,learning_rate=0.5,random_state=42)
+Train Accuracy: 0.9599730018767111
+Train Loss: 0.021761138382874176
+Val Accuracy : 0.9478762094098588
+Val Loss: 0.028336604750795948
+******************************************
+voting_reg = VotingRegressor(estimators=[
+    
+    ('RF', RandomForestRegressor(n_estimators=50,max_depth=9,min_samples_split=10,min_samples_leaf=5,random_state=42)),
+    ('dt', DecisionTreeRegressor(max_depth=8,random_state=42)),
+    ('GradientBoostingTree', GradientBoostingRegressor(learning_rate=0.5,max_depth=4,random_state=42)),
+    ],
+   
+    n_jobs=-1
+)
+
+voting_pipeline = Pipeline(steps=[
+    ('preprocessor', preprocessor),
+    
+    ("model", voting_reg) 
+    ])
+Train Accuracy: 0.955050771287114
+Train Loss: 0.024437165715293977
+Val Accuracy : 0.945654348676326
+Val Loss: 0.029547930647550447
+*****************************************
+best model
+stacking_reg = StackingRegressor(estimators=[
+    ('ridge', Ridge(alpha=0.001, random_state=42)),
+    ('RF', RandomForestRegressor(n_estimators=50,max_depth=9,min_samples_split=10,min_samples_leaf=5,random_state=42)),
+    ('dt', DecisionTreeRegressor(max_depth=8,random_state=42)),
+    ('gb', GradientBoostingRegressor(learning_rate=0.5,max_depth=4,random_state=42)),
+    ],
+   
+    #final_estimator=GradientBoostingRegressor(n_estimators=200,learning_rate=0.5,max_depth=5,random_state=42),
+    cv=3,
+    n_jobs=-1
+)
+
+stacking_pipeline = Pipeline(steps=[
+    ('preprocessor', preprocessor),
+    
+    ("model", stacking_reg) 
+    ])
+Train Accuracy: 0.9591871552052615
+Train Loss: 0.02218837297369861
+Val Accuracy : 0.9501028953688048
+Val Loss: 0.02713133493117816
+Test Accuracy: 94.95578656294838
+Test Loss: 0.02753182004762677
+************************************
+stacking_reg_2 = StackingRegressor(estimators=[
+    ('ridge', Ridge(alpha=0.001, random_state=42)),
+    ('RF', RandomForestRegressor(n_estimators=50,max_depth=9,min_samples_split=10,min_samples_leaf=5,random_state=42)),
+    ('dt', DecisionTreeRegressor(max_depth=8,random_state=42)),
+    ('gb', GradientBoostingRegressor(learning_rate=0.5,max_depth=4,random_state=42)),
+    ],
+   
+    final_estimator=GradientBoostingRegressor(n_estimators=300,alpha=0.1,max_depth=7,random_state=42),
+    cv=3,
+    n_jobs=-1
+)
+
+stacking_pipeline_2 = Pipeline(steps=[
+    ('preprocessor', preprocessor),
+    
+    ("model", stacking_reg_2) 
+    ])
+Train Accuracy: 0.9577503141009394
+Train Loss: 0.022969528183216178
+Val Accuracy : 0.9460177022163192
+Val Loss: 0.029350217360902136
